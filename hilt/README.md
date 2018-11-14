@@ -1,3 +1,3 @@
 # HILT
 
-* [protocol](protocol.md)
+* [protocol](../protocol/protocol.md)
