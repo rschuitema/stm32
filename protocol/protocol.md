@@ -13,6 +13,10 @@ A frame consists of a message header, a message payload and a CRC.
 
 **Protocol Version:** A field combining the fields Major Version and Minor Version.
 
+**Major Version:** The major version number of the hilt protocol.
+
+**Minor Version:** The minor version number of the hilt protocol.
+
 **Message Type:** The type of message:
 
 | value | message type |
