@@ -39,6 +39,8 @@ A frame consists of a message header, a message payload and a CRC.
 ### GPIO reset pin
 ![reset pin](gpio_reset_pin.png)
 
+### GPIO read pin
+
 ### GPIO configure pin
 ![configure pin](gpio_configure_pin.png)
 
