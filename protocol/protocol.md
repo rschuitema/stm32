@@ -19,14 +19,21 @@ The physical format of the messages is described in the following sections.
 ## Frame
 ![Framing](hilt_frame.png)
 
-A frame consists of a header, a payload and a CRC.
-Where:
+A frame consists of a message header, a message payload and a CRC.
 
-*SYNC:* 4 byte ASCII representation of "hilt".
-*LEN:* Payload length in bytes.
-*Sequence:* A sequence number for the frame. It shall be incremented for each new frame that is sent. It shall wrap around from 0xFFFFFFFF to 0x00000000. 
-*Protocol Version:* A field combining the fields Major Version and Minor Version.
-*Message Type:* The type of message:
+**SYNC:** 4 byte ASCII representation of "hilt".
+
+**LEN:** Payload length in bytes.
+
+**Sequence:** A sequence number for the frame. It shall be incremented for each new frame that is sent. It shall wrap around from 0xFFFFFFFF to 0x00000000. 
+
+**Protocol Version:** A field combining the fields Major Version and Minor Version.
+
+**Major Version:** The major version number of the hilt protocol.
+
+**Minor Version:** The minor version number of the hilt protocol.
+
+**Message Type:** The type of message:
 
 | value | message type |
 | ----- | ------------ |
@@ -35,7 +42,7 @@ Where:
 | 2     | event        |
 | 3     | acknowledge  |
 
-*CRC:* CRC16 with polynomial "xyz" calculated over the header + payload.
+**CRC:** CRC16 with polynomial "xyz" calculated over the header + payload.
 
 ## Message
 ![Message](hilt_message.png)
@@ -48,6 +55,8 @@ Where:
 
 ### GPIO reset pin
 ![reset pin](gpio_reset_pin.png)
+
+### GPIO read pin
 
 ### GPIO configure pin
 ![configure pin](gpio_configure_pin.png)
