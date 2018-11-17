@@ -48,6 +48,7 @@ A frame consists of a message header, a message payload and a CRC.
 ![Message](hilt_message.png)
 
 The payload of a message is the same for an action, response and an event.
+For an acknowledge the payload is empty.
 
 **Service:** The service field is used to route the message to the correct service.
 It is also used in the events to indicate from which service send the event.
@@ -73,6 +74,9 @@ GPIO message are meant for the GPIO service.
 ![reset pin](gpio_reset_pin.png)
 
 ### GPIO read pin
+![action_read_pin](gpio_action_read_pin.png)
+
+![response_read_pin](gpio_response_read_pin.png)
 
 ### GPIO configure pin
 ![configure pin](gpio_configure_pin.png)
