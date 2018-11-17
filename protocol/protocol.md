@@ -16,7 +16,7 @@ that indicates what the event is about.
 
 The physical format of the messages is described in the following sections.
 
-## Frame
+## Message
 ![Framing](hilt_frame.png)
 
 A frame consists of a message header, a message payload and a CRC.
@@ -44,11 +44,27 @@ A frame consists of a message header, a message payload and a CRC.
 
 **CRC:** CRC16 with polynomial "xyz" calculated over the header + payload.
 
-## Message
+## Message payload
 ![Message](hilt_message.png)
 
+The payload of a message is the same for an action, response and an event.
+
+**Service:** The service field is used to route the message to the correct service.
+It is also used in the events to indicate from which service send the event.
+
+**Service Action:** The action requested from the service. In the response it indicates
+ for which action is this response.  
+
+**Service Event:** The event that was sent from a service.
+
+**ALEN:** The length of the action data.
+
+**RLEN:** The length of the response data.
+
+**ELEN:** The length of the event data.
 
 ## GPIO Messages
+GPIO message are meant for the GPIO service.
 
 ### GPIO set pin
 ![set pin](gpio_set_pin.png)
@@ -62,6 +78,7 @@ A frame consists of a message header, a message payload and a CRC.
 ![configure pin](gpio_configure_pin.png)
 
 ## I2C Messages
+I2C message are meant for the I2C service.
 
 ### Write register
 
