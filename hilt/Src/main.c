@@ -543,7 +543,11 @@ void StartDefaultTask(void const * argument)
       msg->service = msg->service == GPIO_SERVICE ? I2C_SERVICE : GPIO_SERVICE;
       msg->id += 1;
 	  msg->type = 1;
-	  msg->action = 1;
+
+	  if (msg->service == GPIO_SERVICE)
+	  {
+	      msg->action = msg->action == 1 ? 0: 1;
+	  }
 
 	  cw_pack_context_init (&pc, msg->data, 20, NULL);
 	  cw_pack_unsigned (&pc, pin);
