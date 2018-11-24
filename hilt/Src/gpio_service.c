@@ -10,6 +10,9 @@
 
 /* local constants */
 #define NR_GPIO_PINS (16)
+#define GPIO_INVALID_PIN (0xFFFF)
+#define GPIO_ERROR_INVALID_PIN (1)
+#define GPIO_ERROR_INVALID_ACTION (2)
 
 /* local type definitions */
 typedef enum
@@ -51,6 +54,7 @@ static void gpio_configure_pin(hilt_message_t* msg);
 
 static void gpio_handle_message(hilt_message_t* msg);
 static uint16_t gpio_convert_to_pin(uint16_t pin);
+static void gpio_send_error_response(uint32_t id, uint8_t action, uint8_t error);
 
 /* private variables */
 extern osMessageQId gpio_service_input_q;
@@ -117,6 +121,7 @@ static void gpio_handle_message(hilt_message_t* msg)
 	else
 	{
 		// send response invalid action
+		gpio_send_error_response(msg->id, msg->action, GPIO_ERROR_INVALID_ACTION);
 	}
 }
 
@@ -129,13 +134,14 @@ static void gpio_set_pin(hilt_message_t* msg)
 	uint16_t pin = uc.item.as.u64;
 	uint16_t gpio_pin = gpio_convert_to_pin(pin);
 
-	if (gpio_pin != 0xFFFF)
+	if (gpio_pin != GPIO_INVALID_PIN)
 	{
 		HAL_GPIO_WritePin(GPIOB, gpio_pin, GPIO_PIN_SET);
 	}
 	else
 	{
 		// send error response invalid pin
+		gpio_send_error_response(msg->id, msg->action, GPIO_ERROR_INVALID_PIN);
 	}
 }
 
@@ -148,21 +154,27 @@ static void gpio_reset_pin(hilt_message_t* msg)
 	uint16_t pin = uc.item.as.u64;
 	uint16_t gpio_pin = gpio_convert_to_pin(pin);
 
-	if (gpio_pin != 0xFFFF)
+	if (gpio_pin != GPIO_INVALID_PIN)
 	{
 		HAL_GPIO_WritePin(GPIOB, gpio_pin, GPIO_PIN_RESET);
 	}
 	else
 	{
 		// send error response invalid pin
+		gpio_send_error_response(msg->id, msg->action, GPIO_ERROR_INVALID_PIN);
 	}
 }
 
 static void gpio_read_pin(hilt_message_t* msg)
 {
-	uint16_t gpio_pin = gpio_convert_to_pin(1);
+	cw_unpack_context uc;
+	cw_unpack_context_init (&uc, msg->data, msg->length, NULL);
 
-	if (gpio_pin != 0xFFFF)
+	cw_unpack_next(&uc);
+	uint16_t pin = uc.item.as.u64;
+	uint16_t gpio_pin = gpio_convert_to_pin(pin);
+
+	if (gpio_pin != GPIO_INVALID_PIN)
 	{
 		GPIO_PinState pinstate;
 
@@ -173,12 +185,41 @@ static void gpio_read_pin(hilt_message_t* msg)
 	else
 	{
 		// send error response invalid pin
+		gpio_send_error_response(msg->id, msg->action, GPIO_ERROR_INVALID_PIN);
 	}
 }
 
 static void gpio_configure_pin(hilt_message_t* msg)
 {
+	cw_unpack_context uc;
+	cw_unpack_context_init (&uc, msg->data, msg->length, NULL);
 
+	cw_unpack_next(&uc);
+	uint16_t pin = uc.item.as.u64;
+	uint16_t gpio_pin = gpio_convert_to_pin(pin);
+
+	if (gpio_pin != GPIO_INVALID_PIN)
+	{
+	}
+	else
+	{
+		// send error response invalid pin
+		gpio_send_error_response(msg->id, msg->action, GPIO_ERROR_INVALID_PIN);
+	}
+}
+
+static void gpio_send_error_response(uint32_t id, uint8_t action, uint8_t error)
+{
+	hilt_message_t* error_message = osPoolAlloc(gpio_service_output_pool);
+
+	error_message->id = id;
+	error_message->type = 1; // response
+	error_message->action = action;
+	error_message->service = GPIO_SERVICE;
+	error_message->length = 1;
+	error_message->data[0] = error;
+
+	osStatus status = osMessagePut(gpio_service_output_q, (uint32_t)error_message, 10);
 }
 
 static uint16_t gpio_convert_to_pin(uint16_t pin)
@@ -189,6 +230,6 @@ static uint16_t gpio_convert_to_pin(uint16_t pin)
 	}
 	else
 	{
-		return 0xFFFF;
+		return GPIO_INVALID_PIN;
 	}
 }

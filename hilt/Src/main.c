@@ -90,6 +90,10 @@ osPoolId action_pool;
 osPoolId action_service_input_pool;
 osPoolId gpio_service_input_pool;
 osPoolId i2c_service_input_pool;
+osPoolId response_pool;
+osPoolId gpio_service_output_pool;
+osPoolId action_service_output_pool;
+osPoolId i2c_service_output_pool;
 
 /* USER CODE END PV */
 
@@ -192,9 +196,17 @@ int main(void)
   osPoolDef(action_pool, 10, hilt_message_t);
   action_pool = osPoolCreate(osPool(action_pool));
 
+  osPoolDef(response_pool, 10, hilt_message_t);
+  response_pool = osPoolCreate(osPool(response_pool));
+
   gpio_service_input_pool = action_pool;
   i2c_service_input_pool = action_pool;
   action_service_input_pool = action_pool;
+
+  gpio_service_output_pool = response_pool;
+  i2c_service_output_pool = response_pool;
+  action_service_output_pool = response_pool;
+
   /* USER CODE END RTOS_QUEUES */
  
 

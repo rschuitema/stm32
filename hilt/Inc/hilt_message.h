@@ -51,7 +51,7 @@ extern "C" {
 typedef struct
 {
 	uint32_t id;			/** Identifier of the message. used for matching command and responses.*/
-	uint8_t type;           /** Type of message, command, response, event, ack, nack.*/
+	uint8_t type;           /** Type of message, action, response, event, acknowledge.*/
 	uint8_t service;        /** The service that needs to handle the message.*/
 	uint8_t action;         /** The action required from the service.*/
 	uint8_t length;         /** The length of the message payload.*/
