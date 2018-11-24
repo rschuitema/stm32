@@ -4,12 +4,14 @@
 #include <stdbool.h>
 #include <string.h>
 #include "cmsis_os.h"
+#include "cwpack.h"
 #include "hilt_message.h"
 #include "service_identifiers.h"
 #include "action_service.h"
 
 /* local constants */
 #define SERVICE_QUEUE_MAP_SIZE (5)
+#define ACTION_UNKNOWN_SERVICE (1)
 
 /* local type definitions */
 
@@ -55,15 +57,21 @@ void action_service_task(const void * argument)
 				memcpy(relay_msg->data, msg->data, 20);
 
 				osStatus status = osMessagePut(service_queue_map[msg->service], (uint32_t)relay_msg, 10);
-				if (status == osOK)
-				{
-					msg->id += 1;
-				}
 			}
 			else
 			{
-				// error_message = createResponseMessage(msg->id, unknown_service)
-				// osMessagePut(action_service_output_q, error_msg, 10)
+				cw_pack_context pc;
+				hilt_message_t* error_msg = osPoolAlloc(action_service_output_pool);
+				error_msg->id = msg->id;
+				error_msg->service = msg->service;
+				error_msg->action = msg->action;
+
+				cw_pack_context_init (&pc, error_msg->data, 20, NULL);
+				cw_pack_unsigned (&pc, ACTION_UNKNOWN_SERVICE);
+
+				error_msg->length = pc.current - pc.start;
+
+				osStatus status = osMessagePut(action_service_output_q, (uint32_t)error_msg, 10);
 			}
 
 			osPoolFree(action_service_input_pool, msg);

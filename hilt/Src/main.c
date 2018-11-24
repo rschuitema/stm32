@@ -58,6 +58,7 @@
 #include "gpio_service.h"
 #include "i2c_service.h"
 #include "action_service.h"
+#include "response_service.h"
 
 /* USER CODE END Includes */
 
@@ -76,8 +77,9 @@ osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 osThreadId gpioTaskHandle;
-osThreadId actionTaskHandle;
 osThreadId i2cTaskHandle;
+osThreadId actionTaskHandle;
+osThreadId responseTaskHandle;
 
 osMessageQId gpio_service_input_q;
 osMessageQId gpio_service_output_q;
@@ -85,6 +87,8 @@ osMessageQId i2c_service_input_q;
 osMessageQId i2c_service_output_q;
 osMessageQId action_service_input_q;
 osMessageQId action_service_output_q;
+osMessageQId response_service_input_q;
+osMessageQId response_service_output_q;
 
 osPoolId action_pool;
 osPoolId action_service_input_pool;
@@ -94,6 +98,8 @@ osPoolId response_pool;
 osPoolId gpio_service_output_pool;
 osPoolId action_service_output_pool;
 osPoolId i2c_service_output_pool;
+osPoolId response_service_input_pool;
+osPoolId response_service_output_pool;
 
 /* USER CODE END PV */
 
@@ -180,6 +186,9 @@ int main(void)
   osThreadDef(actionTask, action_service_task, osPriorityNormal, 0, 128);
   actionTaskHandle = osThreadCreate(osThread(actionTask), NULL);
 
+  osThreadDef(responseTask, response_service_task, osPriorityNormal, 0, 128);
+  responseTaskHandle = osThreadCreate(osThread(responseTask), NULL);
+
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -193,6 +202,15 @@ int main(void)
   osMessageQDef(actionQueue, 5, hilt_message_t*);
   action_service_input_q = osMessageCreate(osMessageQ(actionQueue), actionTaskHandle);
 
+  osMessageQDef(responseQueue, 5, hilt_message_t*);
+  response_service_input_q = osMessageCreate(osMessageQ(responseQueue), responseTaskHandle);
+
+  gpio_service_output_q = response_service_input_q;
+  i2c_service_output_q = response_service_input_q;
+  action_service_output_q = response_service_input_q;
+
+
+  /* add memory pools */
   osPoolDef(action_pool, 10, hilt_message_t);
   action_pool = osPoolCreate(osPool(action_pool));
 
