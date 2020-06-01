@@ -84,8 +84,15 @@ GPIO message are meant for the GPIO service.
 ## I2C Messages
 I2C message are meant for the I2C service.
 
+### Configure I2C bus
+![configure i2c](i2c_configure.png)
+
 ### Write register
+![write i2c](i2c_write_master.png)
 
 ### Read register
+![read_i2c](i2c_read_master.png)
 
-### Configure I2C bus
+![response read i2c](i2c_response_read_master.png)
+
+
