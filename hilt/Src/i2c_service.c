@@ -16,7 +16,7 @@
 extern osMessageQId i2c_service_input_q;
 extern osMessageQId i2c_service_output_q;
 extern osPoolId i2c_service_input_pool;
-extern osPoolId i2c_service_output_pool;
+extern osPoolId i2c_servcice_output_pool;
 
 /* public function implementations */
 void i2c_service_task(const void * argument)

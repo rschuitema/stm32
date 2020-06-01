@@ -1,0 +1,40 @@
+@startuml concurrency view
+
+rectangle i2c_service
+rectangle gpio_service
+rectangle dac_service
+rectangle action_service
+rectangle response_service
+rectangle xxx_service
+
+queue i2c_service_input
+queue gpio_service_input
+queue dac_service_input
+queue xxx_service_input
+queue action_service_input
+queue response_service_input
+queue response_service_output
+
+
+action_service_input --> action_service
+action_service --> response_service_input
+action_service --> i2c_service_input
+action_service --> gpio_service_input
+action_service --> dac_service_input
+action_service --> xxx_service_input
+
+
+i2c_service_input --> i2c_service
+gpio_service_input --> gpio_service
+dac_service_input --> dac_service
+xxx_service_input --> xxx_service
+
+gpio_service --> response_service_input
+i2c_service --> response_service_input
+dac_service --> response_service_input
+xxx_service --> response_service_input
+
+response_service_input --> response_service
+response_service --> response_service_output
+
+@enduml

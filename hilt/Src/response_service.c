@@ -15,7 +15,7 @@
 /* private variables */
 extern osMessageQId response_service_input_q;
 extern osMessageQId response_service_output_q;
-extern osPoolId response_service_input_pool;
+extern osPoolId i2c_servcice_output_pool;
 extern osPoolId response_service_output_pool;
 
 /* public function implementations */
@@ -26,7 +26,7 @@ void response_service_task(const void * argument)
 
     for(;;)
     {
-        event = osMessageGet(response_service_input_q, 10);
+		event = osMessageGet(response_service_input_q, 10);
     	msg = event.value.p;
 
         if (event.status == osEventMessage)

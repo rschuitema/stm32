@@ -10,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
+  * Copyright (c) 2019 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -90,13 +90,11 @@ osMessageQId action_service_output_q;
 osMessageQId response_service_input_q;
 osMessageQId response_service_output_q;
 
-osPoolId action_pool;
 osPoolId action_service_input_pool;
-osPoolId gpio_service_input_pool;
-osPoolId i2c_service_input_pool;
-osPoolId response_pool;
-osPoolId gpio_service_output_pool;
 osPoolId action_service_output_pool;
+osPoolId gpio_service_input_pool;
+osPoolId gpio_service_output_pool;
+osPoolId i2c_service_input_pool;
 osPoolId i2c_service_output_pool;
 osPoolId response_service_input_pool;
 osPoolId response_service_output_pool;
@@ -202,29 +200,29 @@ int main(void)
   osMessageQDef(actionQueue, 5, hilt_message_t*);
   action_service_input_q = osMessageCreate(osMessageQ(actionQueue), actionTaskHandle);
 
-  osMessageQDef(responseQueue, 5, hilt_message_t*);
-  response_service_input_q = osMessageCreate(osMessageQ(responseQueue), responseTaskHandle);
+  osMessageQDef(responseInQueue, 5, hilt_message_t*);
+  response_service_input_q = osMessageCreate(osMessageQ(responseInQueue), responseTaskHandle);
+
+  osMessageQDef(responseOutQueue, 5, hilt_message_t*);
+  response_service_output_q = osMessageCreate(osMessageQ(responseOutQueue), responseTaskHandle);
 
   gpio_service_output_q = response_service_input_q;
   i2c_service_output_q = response_service_input_q;
   action_service_output_q = response_service_input_q;
 
-
   /* add memory pools */
-  osPoolDef(action_pool, 10, hilt_message_t);
-  action_pool = osPoolCreate(osPool(action_pool));
+  osPoolDef(actionInPool, 10, hilt_message_t);
+  action_service_input_pool = osPoolCreate(osPool(actionInPool));
 
-  osPoolDef(response_pool, 10, hilt_message_t);
-  response_pool = osPoolCreate(osPool(response_pool));
+  osPoolDef(responseInPool, 10, hilt_message_t);
+  response_service_input_pool = osPoolCreate(osPool(responseInPool));
 
-  gpio_service_input_pool = action_pool;
-  i2c_service_input_pool = action_pool;
-  action_service_input_pool = action_pool;
+  gpio_service_input_pool = action_service_input_pool;
+  i2c_service_input_pool = action_service_input_pool;
 
-  gpio_service_output_pool = response_pool;
-  i2c_service_output_pool = response_pool;
-  action_service_output_pool = response_pool;
-
+  gpio_service_output_pool = response_service_input_pool;
+  i2c_service_output_pool = response_service_input_pool;
+  action_service_output_pool = response_service_input_pool;
   /* USER CODE END RTOS_QUEUES */
  
 
@@ -565,28 +563,26 @@ void StartDefaultTask(void const * argument)
   cw_pack_context pc;
   uint16_t pin = 7;
 
-
   /* Infinite loop */
   for(;;)
   {
-	  msg = osPoolAlloc(action_pool);
-      msg->service = msg->service == GPIO_SERVICE ? I2C_SERVICE : GPIO_SERVICE;
-      msg->id += 1;
-	  msg->type = 1;
+	msg = osPoolAlloc(action_service_input_pool);
+    msg->service = msg->service == GPIO_SERVICE ? I2C_SERVICE : GPIO_SERVICE;
+    msg->id += 1;
+    msg->type = 1;
 
-	  if (msg->service == GPIO_SERVICE)
-	  {
-	      msg->action = msg->action == 1 ? 0: 1;
-	  }
+    if (msg->service == GPIO_SERVICE)
+    {
+      msg->action = msg->action == 1 ? 0: 1;
+    }
 
-	  cw_pack_context_init (&pc, msg->data, 20, NULL);
-	  cw_pack_unsigned (&pc, pin);
+	cw_pack_context_init (&pc, msg->data, 20, NULL);
+    cw_pack_unsigned (&pc, pin);
 
-	  msg->length = pc.current - pc.start;
+    msg->length = pc.current - pc.start;
 
-	  osMessagePut(action_service_input_q, (uint32_t)msg, 10);
-      osDelay(1000);
-
+    osMessagePut(action_service_input_q, (uint32_t)msg, 10);
+    osDelay(1000);
   }
   /* USER CODE END 5 */ 
 }
